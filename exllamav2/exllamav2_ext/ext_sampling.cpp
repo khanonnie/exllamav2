@@ -227,6 +227,22 @@ std::vector<float> sample_basic
 
             // dbg_candidates(num_candidates, temp_probs, temp_indices);
         }
+        
+        if (skew != 0.0f)
+        {
+            float exponent = expf(-skew);
+            float sum = 0.0f;
+            for (int j = 0; j < num_candidates; ++j)
+            {
+                temp_probs[j] = powf(temp_probs[j], exponent);
+                sum += temp_probs[j];
+            }
+            // Normalize the adjusted probabilities
+            for (int j = 0; j < num_candidates; ++j)
+            {
+                temp_probs[j] /= sum;
+            }
+        }
 
         if (num_probs || skew != 0.0f)
         {
@@ -261,11 +277,10 @@ std::vector<float> sample_basic
         }
 
         float random_s = random;
-
-        if (skew != 0.0f)
-        {
-            random_s = powf(random, expf(-skew));
-        }
+        // if (skew != 0.0f)
+        // {
+        //     random_s = powf(random, expf(-skew));
+        // }
 
         // Scale random sampling point a little to account for FP32 rounding errors during softmax. Probs
         // can potentially sum to slightly less than 1 for large-vocab models
